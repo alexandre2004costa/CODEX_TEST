@@ -1,0 +1,4 @@
+Richard Hendriks
+Email: richard.hendriks@mail.com
+13 years experience. Skills: Web Development, Compression
+Source: https://raw.githubusercontent.com/jsonresume/resume-schema/master/sample.resume.json

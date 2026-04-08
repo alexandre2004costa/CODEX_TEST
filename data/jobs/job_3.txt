@@ -1,0 +1,4 @@
+Web Developer
+Company: Unknown Company
+Need 0 years experience. Must have: {'name': 'Web Development', 'level': 'Master', 'keywords': ['HTML', 'CSS', 'JavaScript', 'React', 'Node.js']}, {'name': 'Database Management', 'level': 'Intermediate', 'keywords': ['SQL', 'NoSQL', 'MongoDB']}, Bachelor's degree in Computer Science or related field, 3+ years of experience in web development, Strong understanding of JavaScript, HTML, and CSS
+Source: https://raw.githubusercontent.com/jsonresume/resume-schema/master/sample.job.json

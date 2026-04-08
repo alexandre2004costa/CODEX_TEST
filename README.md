@@ -44,6 +44,9 @@ python -m docflow_ai.cli --cv-dir data/cv --job-dir data/jobs --mode paired
 
 # Portfolio-ready shortlist across all combinations
 python -m docflow_ai.cli --cv-dir data/cv --job-dir data/jobs --mode cross --top-k 5
+
+# Pull extra CV/job text samples from public internet sources before running
+python -m docflow_ai.cli --cv-dir data/cv --job-dir data/jobs --bootstrap-data --mode cross --top-k 5
 ```
 
 ## Example output
