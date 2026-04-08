@@ -1,0 +1,4 @@
+Ana Costa
+Contact: ana.costa@email.com
+Data Scientist with 1.5 years experience in python analytics, SQL, and cloud.
+Skills: Python, SQL, AWS

@@ -1,0 +1,4 @@
+Bruno Silva
+Email: bruno.silva@email.com
+AI Engineer with 3 years experience building NLP pipelines, LLM extraction services, Python APIs and Airflow jobs.
+Skills: Python, NLP, Machine Learning, LLM, FastAPI, SQL, Docker, AWS, Airflow

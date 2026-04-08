@@ -1,0 +1,4 @@
+Junior AI Engineer
+Company: Porto Tech Hub
+We need someone with 2+ years experience in Python and machine learning.
+Must have: NLP, LLM, SQL, Docker, Airflow, FastAPI

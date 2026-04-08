@@ -1,0 +1,4 @@
+NLP Engineer
+Company: US Recruiting AI
+Role requires 3 years experience and hands-on NLP + LLM + ML ops.
+Must have: Python, NLP, LLM, Docker, Kubernetes

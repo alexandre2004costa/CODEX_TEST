@@ -1,0 +1,20 @@
+[project]
+name = "docflow-ai"
+version = "0.1.0"
+description = "LLM + NLP pipeline to extract structured data from CVs and Job Ads"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
