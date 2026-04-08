@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from difflib import SequenceMatcher
-
 from docflow_ai.models import CandidateProfile, JobProfile, MatchResult
 
 
@@ -14,20 +12,21 @@ class CandidateJobMatcher:
 
         if not req_skills:
             skill_score = 0.5
-            missing = []
+            missing: list[str] = []
+            matched: list[str] = []
         else:
-            covered = len(req_skills & cand_skills)
-            skill_score = covered / len(req_skills)
+            matched_set = req_skills & cand_skills
+            matched = sorted(matched_set)
             missing = sorted(req_skills - cand_skills)
+            skill_score = len(matched_set) / len(req_skills)
+
+        extra_skills = max(len(cand_skills - req_skills), 0)
+        extra_bonus = min(extra_skills * 0.03, 0.12)
 
         exp_gap = max(job.min_years_experience - candidate.years_experience, 0)
         exp_score = max(0.0, 1 - exp_gap / 5)
 
-        title_score = 0.0
-        if candidate.name and job.title:
-            title_score = SequenceMatcher(None, candidate.name.lower(), job.title.lower()).ratio()
-
-        final_score = round(0.65 * skill_score + 0.30 * exp_score + 0.05 * title_score, 3)
+        final_score = round(min(1.0, 0.70 * skill_score + 0.25 * exp_score + 0.05 * extra_bonus), 3)
 
         if final_score >= 0.75:
             level = "high"
@@ -42,4 +41,7 @@ class CandidateJobMatcher:
             score=final_score,
             level=level,
             missing_skills=missing,
+            matched_skills=matched,
+            skill_coverage=round(skill_score, 3),
+            experience_gap=round(exp_gap, 2),
         )
