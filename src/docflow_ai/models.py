@@ -27,3 +27,6 @@ class MatchResult:
     score: float
     level: Literal["low", "medium", "high"]
     missing_skills: list[str] = field(default_factory=list)
+    matched_skills: list[str] = field(default_factory=list)
+    skill_coverage: float = 0.0
+    experience_gap: float = 0.0

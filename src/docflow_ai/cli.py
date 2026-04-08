@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 from pathlib import Path
+from typing import Literal
 
 from docflow_ai.pipeline import DocumentPipeline
 
@@ -12,7 +13,16 @@ def load_docs(folder: Path) -> list[str]:
 
 
 def print_table(rows: list[dict[str, str | float]]) -> None:
-    headers = ["candidate", "job_title", "score", "level", "missing_skills"]
+    headers = [
+        "candidate",
+        "job_title",
+        "score",
+        "level",
+        "skill_coverage",
+        "experience_gap",
+        "matched_skills",
+        "missing_skills",
+    ]
     line = " | ".join(headers)
     print(line)
     print("-" * len(line))
@@ -20,21 +30,26 @@ def print_table(rows: list[dict[str, str | float]]) -> None:
         print(" | ".join(str(row[h]) for h in headers))
 
 
-async def run(cv_dir: Path, job_dir: Path) -> None:
+async def run(cv_dir: Path, job_dir: Path, mode: Literal["paired", "cross"], top_k: int | None) -> None:
     pipeline = DocumentPipeline()
     cvs = load_docs(cv_dir)
     jobs = load_docs(job_dir)
-    rows, stats = await pipeline.process_batch(cvs, jobs)
+    rows, stats = await pipeline.process_batch(cvs, jobs, mode=mode, top_k=top_k)
     print_table(rows)
-    print(f"\nProcessed pairs: {stats.processed_pairs} | Avg score: {stats.avg_score:.3f}")
+    print(
+        "\nProcessed pairs: "
+        f"{stats.processed_pairs} | Avg score: {stats.avg_score:.3f} | High fit ratio: {stats.high_fit_ratio:.2%}"
+    )
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run CV x Job extraction/matching pipeline")
     parser.add_argument("--cv-dir", type=Path, default=Path("data/cv"))
     parser.add_argument("--job-dir", type=Path, default=Path("data/jobs"))
+    parser.add_argument("--mode", choices=["paired", "cross"], default="paired")
+    parser.add_argument("--top-k", type=int, default=None)
     args = parser.parse_args()
-    asyncio.run(run(args.cv_dir, args.job_dir))
+    asyncio.run(run(args.cv_dir, args.job_dir, mode=args.mode, top_k=args.top_k))
 
 
 if __name__ == "__main__":

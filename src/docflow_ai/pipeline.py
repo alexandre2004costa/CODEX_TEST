@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
+from typing import Literal
 
 from docflow_ai.extractors import RegexExtractor
 from docflow_ai.matching import CandidateJobMatcher
@@ -12,6 +13,7 @@ from docflow_ai.models import MatchResult
 class PipelineStats:
     processed_pairs: int
     avg_score: float
+    high_fit_ratio: float
 
 
 class DocumentPipeline:
@@ -27,13 +29,25 @@ class DocumentPipeline:
         await asyncio.sleep(0)
         return self.matcher.score(candidate, job)
 
-    async def process_batch(self, cv_docs: list[str], job_docs: list[str]) -> tuple[list[dict[str, str | float]], PipelineStats]:
-        if len(cv_docs) != len(job_docs):
-            msg = "cv_docs and job_docs must have same length"
+    async def process_batch(
+        self,
+        cv_docs: list[str],
+        job_docs: list[str],
+        mode: Literal["paired", "cross"] = "paired",
+        top_k: int | None = None,
+    ) -> tuple[list[dict[str, str | float]], PipelineStats]:
+        if mode == "paired" and len(cv_docs) != len(job_docs):
+            msg = "cv_docs and job_docs must have same length in paired mode"
             raise ValueError(msg)
 
-        tasks = [self.process_pair(cv, job) for cv, job in zip(cv_docs, job_docs, strict=True)]
+        if mode == "paired":
+            tasks = [self.process_pair(cv, job) for cv, job in zip(cv_docs, job_docs, strict=True)]
+        else:
+            tasks = [self.process_pair(cv, job) for cv in cv_docs for job in job_docs]
+
         results = await asyncio.gather(*tasks)
+        if top_k is not None:
+            results = sorted(results, key=lambda r: r.score, reverse=True)[:top_k]
 
         rows = [
             {
@@ -41,10 +55,18 @@ class DocumentPipeline:
                 "job_title": r.job.title or "",
                 "score": r.score,
                 "level": r.level,
+                "skill_coverage": r.skill_coverage,
+                "experience_gap": r.experience_gap,
+                "matched_skills": ", ".join(r.matched_skills),
                 "missing_skills": ", ".join(r.missing_skills),
             }
             for r in results
         ]
         avg = sum(r["score"] for r in rows) / len(rows) if rows else 0.0
-        stats = PipelineStats(processed_pairs=len(results), avg_score=float(avg))
+        high_fit_count = sum(1 for r in rows if r["level"] == "high")
+        stats = PipelineStats(
+            processed_pairs=len(results),
+            avg_score=float(avg),
+            high_fit_ratio=(high_fit_count / len(rows)) if rows else 0.0,
+        )
         return rows, stats
