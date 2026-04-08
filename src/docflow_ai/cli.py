@@ -5,6 +5,7 @@ import asyncio
 from pathlib import Path
 from typing import Literal
 
+from docflow_ai.bootstrap import bootstrap_dataset
 from docflow_ai.pipeline import DocumentPipeline
 
 
@@ -48,7 +49,13 @@ def main() -> None:
     parser.add_argument("--job-dir", type=Path, default=Path("data/jobs"))
     parser.add_argument("--mode", choices=["paired", "cross"], default="paired")
     parser.add_argument("--top-k", type=int, default=None)
+    parser.add_argument("--bootstrap-data", action="store_true", help="Download extra CV/job samples from internet")
     args = parser.parse_args()
+
+    if args.bootstrap_data:
+        added_cv, added_job = bootstrap_dataset(args.cv_dir, args.job_dir)
+        print(f"Downloaded {added_cv} CV docs and {added_job} job docs into local data folders.")
+
     asyncio.run(run(args.cv_dir, args.job_dir, mode=args.mode, top_k=args.top_k))
 
 
